@@ -121,13 +121,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         );
 
         if let Some(ref region) = &region {
+            print!(" {:5} ", region.name);
             print_memory(
-                region.name,
                 region.start,
                 region.end(args.flash_size),
                 section.address(),
                 section.size(),
-                args.width,
+                args.width - section_name_max_width - 26, // 26 = `address` + `size` + spaces + brackets + region name
             );
         }
 
@@ -138,14 +138,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn print_memory(
-    region_name: &str,
     region_start: u64,
     region_end: u64,
     block_start: u64,
     block_size: u64,
     width: usize,
 ) {
-    print!(" {:5} ", region_name);
     let region_size = region_end - region_start;
     let offset =
         ((width as f64 / region_size as f64) * (block_start as f64 - region_start as f64)) as usize;
