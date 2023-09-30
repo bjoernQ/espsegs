@@ -149,7 +149,8 @@ fn print_memory(
         ((width as f64 / region_size as f64) * (block_start as f64 - region_start as f64)) as usize;
     let w = ((width as f64 / region_size as f64) * block_size as f64) as usize;
 
-    let (small, w) = if w == 0 { (true, 1) } else { (false, w) };
+    let small = w == 0;
+    let w = w.max(1);
 
     print!("[");
 
