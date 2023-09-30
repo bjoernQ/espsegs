@@ -34,12 +34,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let chip = normalize(&args.chip);
     let chip_memory = MEMORY.iter().find(|m| normalize(&m.name) == chip);
 
-    if let None = chip_memory {
+    let Some(chip_memory) = chip_memory else {
         println!("Unknown chip");
         exit(1);
-    }
-
-    let chip_memory = chip_memory.unwrap();
+    };
 
     let mut last_region = usize::MAX;
 
