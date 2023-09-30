@@ -11,6 +11,11 @@ struct Args {
     file: PathBuf,
     #[arg(short, long)]
     chip: String,
+
+}
+
+fn normalize(chip_name: &str) -> String {
+    chip_name.replace("-", "").to_ascii_lowercase()
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -26,10 +31,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         .collect();
     sections.sort_by(|a, b| a.address().partial_cmp(&b.address()).unwrap());
 
-    let chip = args.chip.replace("-", "").to_ascii_lowercase();
-    let chip_memory = MEMORY
-        .iter()
-        .find(|m| m.name.replace("-", "").to_ascii_lowercase() == chip);
+    let chip = normalize(&args.chip);
+    let chip_memory = MEMORY.iter().find(|m| normalize(&m.name) == chip);
 
     if let None = chip_memory {
         println!("Unknown chip");
