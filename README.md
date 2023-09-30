@@ -1,15 +1,17 @@
 # espsegs
 
 ```
-Usage: espsegs.exe --chip <CHIP> <FILE>
+Usage: espsegs [OPTIONS] --chip <CHIP> <FILE>
 
 Arguments:
   <FILE>
 
 Options:
   -c, --chip <CHIP>
-  -h, --help         Print help
-  -V, --version      Print version
+  -s, --flash-size <SIZE>  [possible values: 256KB, 512KB, 1MB, 2MB, 4MB, 8MB, 16MB, 32MB, 64MB, 128MB, 256MB]
+  -w, --width <WIDTH>      [default: 120]
+  -h, --help               Print help (see more with '--help')
+  -V, --version            Print version
 
 ```
 
