@@ -3,8 +3,6 @@ use std::{error::Error, fs, path::PathBuf, process::exit};
 use clap::{Parser, ValueEnum};
 use object::{Object, ObjectSection};
 
-const WIDTH: usize = 120;
-
 #[derive(Clone, Copy, Debug, ValueEnum)]
 #[value(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum FlashSize {
@@ -59,7 +57,10 @@ struct Args {
     chip: String,
 
     #[arg(short = 's', long, value_name = "SIZE", value_enum)]
-    pub flash_size: Option<FlashSize>,
+    flash_size: Option<FlashSize>,
+
+    #[arg(short = 'w', long, default_value = "120")]
+    width: usize,
 }
 
 fn normalize(chip_name: &str) -> String {
@@ -120,12 +121,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         );
 
         if let Some(ref region) = &region {
-            print!(" {:5} ", region.name);
             print_memory(
+                region.name,
                 region.start,
                 region.end(args.flash_size),
                 section.address(),
                 section.size(),
+                args.width,
             );
         }
 
@@ -135,11 +137,19 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn print_memory(region_start: u64, region_end: u64, block_start: u64, block_size: u64) {
+fn print_memory(
+    region_name: &str,
+    region_start: u64,
+    region_end: u64,
+    block_start: u64,
+    block_size: u64,
+    width: usize,
+) {
+    print!(" {:5} ", region_name);
     let region_size = region_end - region_start;
     let offset =
-        ((WIDTH as f64 / region_size as f64) * (block_start as f64 - region_start as f64)) as u32;
-    let w = ((WIDTH as f64 / region_size as f64) * block_size as f64) as u32;
+        ((width as f64 / region_size as f64) * (block_start as f64 - region_start as f64)) as usize;
+    let w = ((width as f64 / region_size as f64) * block_size as f64) as usize;
 
     let (small, w) = if w == 0 { (true, 1) } else { (false, w) };
 
@@ -155,7 +165,7 @@ fn print_memory(region_start: u64, region_end: u64, block_start: u64, block_size
             print!("\u{2588}");
         }
     }
-    for _ in 0..(WIDTH as u32 - w - offset) {
+    for _ in 0..(width - w - offset) {
         print!(" ");
     }
     print!("]");
