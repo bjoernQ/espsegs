@@ -88,6 +88,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     };
 
     let mut last_region = usize::MAX;
+
+    // Calculate max section name width for the first column
+    let mut section_name_max_width = 0;
+    for section in sections.iter() {
+        let name = section.name().unwrap();
+        if name.len() > section_name_max_width {
+            section_name_max_width = name.len();
+        }
+    }
+
     for section in sections {
         let region = chip_memory.regions.iter().find(|region| {
             region.start <= section.address()
@@ -102,10 +112,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
 
         print!(
-            "{:<12.12} {:8x} {:7}",
+            "{:width$} {:8x} {:7}",
             section.name().unwrap(),
             section.address(),
-            section.size()
+            section.size(),
+            width = section_name_max_width,
         );
 
         if let Some(ref region) = &region {
