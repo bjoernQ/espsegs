@@ -1,17 +1,65 @@
 use std::{error::Error, fs, path::PathBuf, process::exit};
 
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use object::{Object, ObjectSection};
 
 const WIDTH: usize = 120;
+
+#[derive(Clone, Copy, Debug, ValueEnum)]
+#[value(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum FlashSize {
+    /// 256 KB
+    _256Kb,
+    /// 512 KB
+    _512Kb,
+    /// 1 MB
+    _1Mb,
+    /// 2 MB
+    _2Mb,
+    /// 4 MB
+    _4Mb,
+    /// 8 MB
+    _8Mb,
+    /// 16 MB
+    _16Mb,
+    /// 32 MB
+    _32Mb,
+    /// 64 MB
+    _64Mb,
+    /// 128 MB
+    _128Mb,
+    /// 256 MB
+    _256Mb,
+}
+
+impl FlashSize {
+    fn bytes(self) -> u64 {
+        match self {
+            FlashSize::_256Kb => 256 * 1024,
+            FlashSize::_512Kb => 512 * 1024,
+            FlashSize::_1Mb => 1024 * 1024,
+            FlashSize::_2Mb => 2 * 1024 * 1024,
+            FlashSize::_4Mb => 4 * 1024 * 1024,
+            FlashSize::_8Mb => 8 * 1024 * 1024,
+            FlashSize::_16Mb => 16 * 1024 * 1024,
+            FlashSize::_32Mb => 32 * 1024 * 1024,
+            FlashSize::_64Mb => 64 * 1024 * 1024,
+            FlashSize::_128Mb => 128 * 1024 * 1024,
+            FlashSize::_256Mb => 256 * 1024 * 1024,
+        }
+    }
+}
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
     file: PathBuf,
+
     #[arg(short, long)]
     chip: String,
 
+    #[arg(short = 's', long, value_name = "SIZE", value_enum)]
+    pub flash_size: Option<FlashSize>,
 }
 
 fn normalize(chip_name: &str) -> String {
@@ -40,10 +88,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     };
 
     let mut last_region = usize::MAX;
-
     for section in sections {
         let region = chip_memory.regions.iter().find(|region| {
-            region.start <= section.address() && region.end >= (section.address() + section.size())
+            region.start <= section.address()
+                && region.end(args.flash_size) >= (section.address() + section.size())
         });
 
         if let Some(ref region) = &region {
@@ -62,7 +110,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         if let Some(ref region) = &region {
             print!(" {:5} ", region.name);
-            print_memory(region.start, region.end, section.address(), section.size());
+            print_memory(
+                region.start,
+                region.end(args.flash_size),
+                section.address(),
+                section.size(),
+            );
         }
 
         println!();
@@ -106,7 +159,19 @@ pub struct MemoryRegion {
     id: usize,
     name: &'static str,
     start: u64,
-    end: u64,
+    length: u64,
+}
+
+impl MemoryRegion {
+    pub fn end(&self, flash_size: Option<FlashSize>) -> u64 {
+        let length = if self.name.ends_with("ROM") && flash_size.is_some() {
+            flash_size.unwrap().bytes()
+        } else {
+            self.length
+        };
+
+        self.start + length
+    }
 }
 
 // TODO double check and add more chips
@@ -118,25 +183,25 @@ const MEMORY: &[Memory] = &[
                 id: 0,
                 name: "DRAM",
                 start: 0x3FFB0000,
-                end: 0x3FFB0000 + 176 * 1024,
+                length: 176 * 1024,
             },
             MemoryRegion {
                 id: 1,
                 name: "IRAM",
                 start: 0x40080000,
-                end: 0x40080000 + 128 * 1024,
+                length: 128 * 1024,
             },
             MemoryRegion {
                 id: 2,
                 name: "DROM",
                 start: 0x3F400000,
-                end: 0x3F400000 + 4 * 1024 * 1024,
+                length: 4 * 1024 * 1024,
             },
             MemoryRegion {
                 id: 3,
                 name: "IROM",
                 start: 0x400D0000,
-                end: 0x400D0000 + 4 * 1024 * 1024,
+                length: 4 * 1024 * 1024,
             },
         ],
     },
@@ -147,25 +212,25 @@ const MEMORY: &[Memory] = &[
                 id: 0,
                 name: "DRAM",
                 start: 0x3FC8_8000,
-                end: 0x3FCE_FFFF,
+                length: 0x3FCE_FFFF - 0x3FC8_8000,
             },
             MemoryRegion {
                 id: 1,
                 name: "IRAM",
                 start: 0x4037_8000,
-                end: 0x403D_FFFF,
+                length: 0x403D_FFFF - 0x4037_8000,
             },
             MemoryRegion {
                 id: 2,
                 name: "DROM",
                 start: 0x3C00_0000,
-                end: 0x3DFF_FFFF,
+                length: 0x3DFF_FFFF - 0x3C00_0000,
             },
             MemoryRegion {
                 id: 3,
                 name: "IROM",
                 start: 0x4200_0000,
-                end: 0x43FF_FFFF,
+                length: 0x43FF_FFFF - 0x4200_0000,
             },
         ],
     },
@@ -176,25 +241,25 @@ const MEMORY: &[Memory] = &[
                 id: 0,
                 name: "DRAM",
                 start: 0x3FC80000,
-                end: 0x3FC80000 + 0x50000,
+                length: 0x50000,
             },
             MemoryRegion {
                 id: 1,
                 name: "IRAM",
                 start: 0x4037C000,
-                end: 0x4037C000 + 400 * 1024,
+                length: 400 * 1024,
             },
             MemoryRegion {
                 id: 2,
                 name: "DROM",
                 start: 0x3C000000,
-                end: 0x3C000000 + 0x400000,
+                length: 0x400000,
             },
             MemoryRegion {
                 id: 3,
                 name: "IROM",
                 start: 0x42000000,
-                end: 0x42000000 + 0x400000,
+                length: 0x400000,
             },
         ],
     },
