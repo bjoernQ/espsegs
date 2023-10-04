@@ -193,7 +193,6 @@ impl MemoryRegion {
     }
 }
 
-// TODO double check and add more chips
 const MEMORY: &[Memory] = &[
     Memory {
         name: "ESP32",
@@ -221,6 +220,35 @@ const MEMORY: &[Memory] = &[
                 name: "IROM",
                 start: 0x400D0000,
                 length: 4 * 1024 * 1024,
+            },
+        ],
+    },
+    Memory {
+        name: "ESP32-S2",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "DRAM",
+                start: 0x3FFB0000,
+                length: 0x40000000 - 0x3FFB0000,
+            },
+            MemoryRegion {
+                id: 1,
+                name: "IRAM",
+                start: 0x40020000,
+                length: 0x40070000 - 0x40020000,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "DROM",
+                start: 0x3F000000,
+                length: 0x3FF80000 - 0x3F000000,
+            },
+            MemoryRegion {
+                id: 3,
+                name: "IROM",
+                start: 0x40080000,
+                length: 0x40800000 - 0x40080000,
             },
         ],
     },
@@ -254,6 +282,35 @@ const MEMORY: &[Memory] = &[
         ],
     },
     Memory {
+        name: "ESP32-C2",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "DRAM",
+                start: 0x3FCA0000,
+                length: 0x3FCE0000 - 0x3FCA0000,
+            },
+            MemoryRegion {
+                id: 1,
+                name: "IRAM",
+                start: 0x4037C000,
+                length: 0x403C0000 - 0x4037C000,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "DROM",
+                start: 0x3C000000,
+                length: 0x3C400000 - 0x3C000000,
+            },
+            MemoryRegion {
+                id: 3,
+                name: "IROM",
+                start: 0x42000000,
+                length: 0x42400000 - 0x42000000,
+            },
+        ],
+    },
+    Memory {
         name: "ESP32-C3",
         regions: &[
             MemoryRegion {
@@ -279,6 +336,40 @@ const MEMORY: &[Memory] = &[
                 name: "IROM",
                 start: 0x42000000,
                 length: 0x400000,
+            },
+        ],
+    },
+    Memory {
+        name: "ESP32-C6",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "RAM",
+                start: 0x40800000,
+                length: 0x40880000 - 0x40800000,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "ROM",
+                start: 0x42000000,
+                length: 0x10000 << 8,
+            },
+        ],
+    },
+    Memory {
+        name: "ESP32-H2",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "DRAM",
+                start: 0x40800000,
+                length: 0x40850000 - 0x40800000,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "ROM",
+                start: 0x42000000,
+                length: 0x10000 << 8,
             },
         ],
     },
