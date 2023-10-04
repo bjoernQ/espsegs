@@ -1,0 +1,54 @@
+---
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**/README.md"
+  pull_request:
+    paths-ignore:
+      - "**/README.md"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  cargo-checks:
+    name: Cargo checks | ${{ matrix.os }} | ${{ matrix.action.command }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        action:
+          - command: check
+          - command: fmt
+            args: --all -- --check
+          - command: clippy
+            args: --all-targets --all-features --workspace -- -D warnings
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Enable caching
+        uses: Swatinem/rust-cache@v2
+      - name: Cargo command
+        run: cargo ${{ matrix.action.command }} ${{ matrix.action.args }}
+
+  msrv:
+    name: MSRV check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.65.0
+      - name: Enable caching
+        uses: Swatinem/rust-cache@v2
+      - name: Cargo check
+        run: cargo check
