@@ -121,7 +121,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         );
 
         if let Some(region) = &region {
-            print!(" {:5} ", region.name);
+            print!(" {:8} ", region.name);
             print_memory(
                 region.start,
                 region.end(args.flash_size),
@@ -193,6 +193,7 @@ impl MemoryRegion {
     }
 }
 
+#[cfg(not(feature = "expert"))]
 const MEMORY: &[Memory] = &[
     Memory {
         name: "ESP32",
@@ -349,7 +350,7 @@ const MEMORY: &[Memory] = &[
                 length: 0x40880000 - 0x40800000,
             },
             MemoryRegion {
-                id: 2,
+                id: 1,
                 name: "ROM",
                 start: 0x42000000,
                 length: 0x10000 << 8,
@@ -366,10 +367,319 @@ const MEMORY: &[Memory] = &[
                 length: 0x40850000 - 0x40800000,
             },
             MemoryRegion {
-                id: 2,
+                id: 1,
                 name: "ROM",
                 start: 0x42000000,
                 length: 0x10000 << 8,
+            },
+        ],
+    },
+];
+
+#[cfg(feature = "expert")]
+const MEMORY: &[Memory] = &[
+    Memory {
+        name: "ESP32",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "DROM",
+                start: 0x3F400000,
+                length: 4 * 1024 * 1024,
+            },
+            MemoryRegion {
+                id: 1,
+                name: "IROM",
+                start: 0x400D0000,
+                length: 4 * 1024 * 1024,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "DRTC_FAST",
+                start: 0x3FF8_0000,
+                length: 0x3FF8_1FFF - 0x3FF8_0000,
+            },
+            MemoryRegion {
+                id: 3,
+                name: "DRAM2",
+                start: 0x3FFA_E000,
+                length: 0x3FFD_FFFF - 0x3FFA_E000,
+            },
+            MemoryRegion {
+                id: 4,
+                name: "DRAM1",
+                start: 0x3FFE_0000,
+                length: 0x3FFF_FFFF - 0x3FFE_0000,
+            },
+            MemoryRegion {
+                id: 5,
+                name: "Cache",
+                start: 0x4007_0000,
+                length: 0x4007_FFFF - 0x4007_0000,
+            },
+            MemoryRegion {
+                id: 6,
+                name: "IRAM0",
+                start: 0x4008_0000,
+                length: 0x4009_FFFF - 0x4008_0000,
+            },
+            MemoryRegion {
+                id: 7,
+                name: "IRAM1",
+                start: 0x400A_0000,
+                length: 0x400A_FFFF - 0x400A_0000,
+            },
+            MemoryRegion {
+                id: 8,
+                name: "IRAM1*",
+                start: 0x400B_8000,
+                length: 0x400B_FFFF - 0x400B_8000,
+            },
+            MemoryRegion {
+                id: 9,
+                name: "IRTC_FAST",
+                start: 0x400C_0000,
+                length: 0x400C_1FFF - 0x400C_0000,
+            },
+            MemoryRegion {
+                id: 10,
+                name: "RTC_SLOW",
+                start: 0x5000_0000,
+                length: 0x5000_1FFF - 0x5000_0000,
+            },
+        ],
+    },
+    Memory {
+        name: "ESP32-S2",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "DROM",
+                start: 0x3F000000,
+                length: 0x3FF80000 - 0x3F000000,
+            },
+            MemoryRegion {
+                id: 1,
+                name: "IROM",
+                start: 0x40080000,
+                length: 0x40800000 - 0x40080000,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "DRTC_FAST",
+                start: 0x3FF9_E000,
+                length: 0x3FF9_FFFF - 0x3FF9_E000,
+            },
+            MemoryRegion {
+                id: 3,
+                name: "DRAM0",
+                start: 0x3FFB_0000,
+                length: 0x3FFB_7FFF - 0x3FFB_0000,
+            },
+            MemoryRegion {
+                id: 4,
+                name: "DRAM1",
+                start: 0x3FFB_8000,
+                length: 0x3FFF_FFFF - 0x3FFB_8000,
+            },
+            MemoryRegion {
+                id: 5,
+                name: "IRAM0",
+                start: 0x4002_0000,
+                length: 0x4002_7FFF - 0x4002_0000,
+            },
+            MemoryRegion {
+                id: 6,
+                name: "IRAM1",
+                start: 0x4002_8000,
+                length: 0x4006_FFFF - 0x4002_8000,
+            },
+            MemoryRegion {
+                id: 7,
+                name: "IRTC_FAST",
+                start: 0x4007_0000,
+                length: 0x4007_1FFF - 0x4007_0000,
+            },
+            MemoryRegion {
+                id: 8,
+                name: "RTC_SLOW",
+                start: 0x5000_0000,
+                length: 0x5000_1FFF - 0x5000_0000,
+            },
+        ],
+    },
+    Memory {
+        name: "ESP32-S3",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "DROM",
+                start: 0x3C00_0000,
+                length: 0x3DFF_FFFF - 0x3C00_0000,
+            },
+            MemoryRegion {
+                id: 1,
+                name: "IROM",
+                start: 0x4200_0000,
+                length: 0x43FF_FFFF - 0x4200_0000,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "DRAM1",
+                start: 0x3FC8_8000,
+                length: 0x3FCE_FFFF - 0x3FC8_8000,
+            },
+            MemoryRegion {
+                id: 3,
+                name: "DRAM2",
+                start: 0x3FCF_0000,
+                length: 0x3FCF_FFFF - 0x3FCF_0000,
+            },
+            MemoryRegion {
+                id: 4,
+                name: "IRAM1",
+                start: 0x4037_0000,
+                length: 0x4037_7FFF - 0x4037_0000,
+            },
+            MemoryRegion {
+                id: 5,
+                name: "IRAM2",
+                start: 0x4037_8000,
+                length: 0x403D_FFFF - 0x4037_8000,
+            },
+            MemoryRegion {
+                id: 6,
+                name: "RTC_SLOW",
+                start: 0x5000_0000,
+                length: 0x5000_1FFF - 0x5000_0000,
+            },
+            MemoryRegion {
+                id: 7,
+                name: "RTC_FAST",
+                start: 0x600F_E000,
+                length: 0x600F_FFFF - 0x600F_E000,
+            },
+        ],
+    },
+    Memory {
+        name: "ESP32-C2",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "DROM",
+                start: 0x3C000000,
+                length: 0x3C400000 - 0x3C000000,
+            },
+            MemoryRegion {
+                id: 1,
+                name: "IROM",
+                start: 0x42000000,
+                length: 0x42400000 - 0x42000000,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "DRAM1",
+                start: 0x3FCA_0000,
+                length: 0x3FCD_FFFF - 0x3FCA_0000,
+            },
+            MemoryRegion {
+                id: 3,
+                name: "IRAM0",
+                start: 0x4037_C000,
+                length: 0x4037_FFFF - 0x4037_C000,
+            },
+            MemoryRegion {
+                id: 4,
+                name: "IRAM1",
+                start: 0x4038_0000,
+                length: 0x403B_FFFF - 0x4038_0000,
+            },
+        ],
+    },
+    Memory {
+        name: "ESP32-C3",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "DROM",
+                start: 0x3C000000,
+                length: 0x400000,
+            },
+            MemoryRegion {
+                id: 1,
+                name: "IROM",
+                start: 0x42000000,
+                length: 0x400000,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "DRAM1",
+                start: 0x3FC8_0000,
+                length: 0x3FCD_FFFF - 0x3FC8_0000,
+            },
+            MemoryRegion {
+                id: 3,
+                name: "IRAM0",
+                start: 0x4037_C000,
+                length: 0x4037_FFFF - 0x4037_C000,
+            },
+            MemoryRegion {
+                id: 4,
+                name: "IRAM1",
+                start: 0x4038_0000,
+                length: 0x403D_FFFF - 0x4038_0000,
+            },
+            MemoryRegion {
+                id: 4,
+                name: "RTCFAST",
+                start: 0x5000_0000,
+                length: 0x5000_1FFF - 0x5000_0000,
+            },
+        ],
+    },
+    Memory {
+        name: "ESP32-C6",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "RAM",
+                start: 0x40800000,
+                length: 0x40880000 - 0x40800000,
+            },
+            MemoryRegion {
+                id: 1,
+                name: "ROM",
+                start: 0x42000000,
+                length: 0x10000 << 8,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "LPRAM",
+                start: 0x5000_0000,
+                length: 0x5000_3FFF - 0x5000_0000,
+            },
+        ],
+    },
+    Memory {
+        name: "ESP32-H2",
+        regions: &[
+            MemoryRegion {
+                id: 0,
+                name: "DRAM",
+                start: 0x40800000,
+                length: 0x40850000 - 0x40800000,
+            },
+            MemoryRegion {
+                id: 1,
+                name: "ROM",
+                start: 0x42000000,
+                length: 0x10000 << 8,
+            },
+            MemoryRegion {
+                id: 2,
+                name: "LPRAM",
+                start: 0x5000_0000,
+                length: 0x5000_0FFF - 0x5000_0000,
             },
         ],
     },

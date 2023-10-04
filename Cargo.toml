@@ -9,3 +9,7 @@ repository = "https://github.com/bjoernQ/espsegs"
 [dependencies]
 object = "0.31.1"
 clap = { version = "4.3.0", features = ["derive"] }
+
+[features]
+default = []
+expert = []
