@@ -64,7 +64,7 @@ struct Args {
 }
 
 fn normalize(chip_name: &str) -> String {
-    chip_name.replace("-", "").to_ascii_lowercase()
+    chip_name.replace('-', "").to_ascii_lowercase()
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -81,7 +81,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     sections.sort_by(|a, b| a.address().partial_cmp(&b.address()).unwrap());
 
     let chip = normalize(&args.chip);
-    let chip_memory = MEMORY.iter().find(|m| normalize(&m.name) == chip);
+    let chip_memory = MEMORY.iter().find(|m| normalize(m.name) == chip);
 
     let Some(chip_memory) = chip_memory else {
         println!("Unknown chip");
@@ -105,7 +105,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 && region.end(args.flash_size) >= (section.address() + section.size())
         });
 
-        if let Some(ref region) = &region {
+        if let Some(region) = &region {
             if region.id != last_region {
                 println!();
                 last_region = region.id;
@@ -120,7 +120,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             width = section_name_max_width,
         );
 
-        if let Some(ref region) = &region {
+        if let Some(region) = &region {
             print!(" {:5} ", region.name);
             print_memory(
                 region.start,
@@ -184,10 +184,9 @@ pub struct MemoryRegion {
 
 impl MemoryRegion {
     pub fn end(&self, flash_size: Option<FlashSize>) -> u64 {
-        let length = if self.name.ends_with("ROM") && flash_size.is_some() {
-            flash_size.unwrap().bytes()
-        } else {
-            self.length
+        let length = match self.name.ends_with("ROM") && flash_size.is_some() {
+            true => flash_size.unwrap().bytes(),
+            false => self.length,
         };
 
         self.start + length
