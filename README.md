@@ -1,5 +1,13 @@
 # espsegs
 
+## Installation
+
+```
+cargo install --git https://github.com/bjoernQ/espsegs
+```
+
+## Usage
+
 ```
 Usage: espsegs [OPTIONS] --chip <CHIP> <FILE>
 
@@ -15,7 +23,7 @@ Options:
 
 ```
 
-Example
+### Example
 
 ```
 ❯ espsegs \projects\esp\esp-wifi\target\riscv32imc-unknown-none-elf\release\examples\embassy_dhcp --chip esp32c3
